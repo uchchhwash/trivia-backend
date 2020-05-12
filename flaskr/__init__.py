@@ -73,7 +73,6 @@ def create_app(test_config=None):
       "total_questions": len(Question.query.all()),
       "categories": categories,
       "current_catrgory": None
-
     })
 
   '''
@@ -103,7 +102,7 @@ def create_app(test_config=None):
       })
 
     except:
-      abort(422)
+      abort(500)
 
   '''
   @TODO: 
@@ -140,7 +139,7 @@ def create_app(test_config=None):
       })
 
     except:
-      abort(422) 
+      abort(500) 
   '''
   @TODO: 
   Create a POST endpoint to get questions based on a search term. 
@@ -177,15 +176,18 @@ def create_app(test_config=None):
   '''
   @app.route('/categories/<int:category_id>/questions')
   def get_questions_by_category(category_id):
-    questions = Question.query.filter(Question.category == category_id).order_by(Question.id).all()
-    questions = [question.format() for question in questions]
+    try:
+      questions = Question.query.filter(Question.category == category_id).order_by(Question.id).all()
+      questions = [question.format() for question in questions]
 
-    return jsonify({
-      "success": True,
-      "questions": questions,
-      "total_questions":len(questions),
-      "current_category":category_id
-    })
+      return jsonify({
+        "success": True,
+        "questions": questions,
+        "total_questions":len(questions),
+        "current_category":category_id
+      })
+    except:
+      abort(404)
 
 
   '''
@@ -199,13 +201,76 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
+  @app.route('/quiz', methods=['POST'])
+  def get_quiz_quesitons():
+    body = request.get_json()
+
+    previous_questions = body.get('previous_questions', [])
+    quiz_category = body.get('quiz_category', None)
+    
+    selection = []
+    
+    try:
+      if quiz_category is not None:
+        if quiz_category == 0:
+          selections = Question.query.all()
+        else:
+          selections = Question.query.filter(Question.category == quiz_category).all()
+        
+        question_set = [question.format() for question in selections 
+                      if question.id not in previous_questions]
+      
+        if len(question_set) == 0:
+          return jsonify({
+            "success": True,
+            "question": None
+          })
+        question = random.choice(question_set)
+        print(question)
+        return jsonify({
+            "success": True,
+            "question": question
+        })
+    except:
+      abort(500)
 
   '''
   @TODO: 
   Create error handlers for all expected errors 
   including 404 and 422. 
   '''
-  
+  @app.errorhandler(404)
+  def not_found(error):
+      return jsonify({
+          "success": False,
+          "error": 404,
+          "message": "esource not found"
+      }), 404
+
+  @app.errorhandler(422)
+  def unprocessable(error):
+      return jsonify({
+          "success": False,
+          "error": 422,
+          "message": "Unprocessable"
+      }), 422
+
+  @app.errorhandler(400)
+  def bad_request(error):
+      return jsonify({
+          "success": False,
+          "error": 400,
+          "message": "Bad Request"
+      }), 400
+
+  @app.errorhandler(500)
+  def internal_error(error):
+      return jsonify({
+          "success": False,
+          "error": 500,
+          "message": "Internal server error"
+      })
+
   return app
 
     
