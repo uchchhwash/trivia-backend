@@ -8,6 +8,15 @@ from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
 
+def paginate_questions(request, selection):
+  page = request.args.get('page', 1, type=int)
+  start = (page-1) * QUESTIONS_PER_PAGE
+  end = start + QUESTIONS_PER_PAGE
+
+  questions = [question.format() for question in selection]
+  currrent_page_questions = questions[start:end]
+  return currrent_page_questions
+
 def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
@@ -16,7 +25,7 @@ def create_app(test_config=None):
   '''
   @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
   '''
-  cors= CORS(app, resources={r"/api/*": {"origins": "*"}})
+  CORS(app, resources={r"/api/*": {"origins": "*"}})
 
   '''
   @TODO: Use the after_request decorator to set Access-Control-Allow
@@ -31,7 +40,13 @@ def create_app(test_config=None):
   Create an endpoint to handle GET requests 
   for all available categories.
   '''
-
+  @app.route('/categories',methods=['GET'])
+  def get_categories():
+    categories = list(map(Category.format, Category.query.all()))
+    return jsonify({
+      "success": True,
+      "categories": categories
+    })
 
   '''
   @TODO: 
@@ -39,12 +54,27 @@ def create_app(test_config=None):
   including pagination (every 10 questions). 
   This endpoint should return a list of questions, 
   number of total questions, current category, categories. 
-
+  
   TEST: At this point, when you start the application
   you should see questions and categories generated,
   ten questions per page and pagination at the bottom of the screen for three pages.
   Clicking on the page numbers should update the questions. 
+  
   '''
+  @app.route('/questions')
+  def get_questions():
+    questions = Question.query.all()
+    current_page_questions = paginate_questions(request, questions)
+    categories = list(map(Category.format, Category.query.all()))
+    
+    return jsonify({
+      "success": True,
+      "questions": current_page_questions,
+      "total_questions": len(Question.query.all()),
+      "categories": categories,
+      "current_catrgory": None
+
+    })
 
   '''
   @TODO: 
