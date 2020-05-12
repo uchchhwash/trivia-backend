@@ -3,7 +3,7 @@ from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
-
+import re
 from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
@@ -151,7 +151,22 @@ def create_app(test_config=None):
   only question that include that string within their question. 
   Try using the word "title" to start. 
   '''
-
+  @app.route('/search', methods=['POST'])
+  def search_questions():
+    body = request.get_json()
+    search = body.get('searchTerm', None)
+    try:
+      if search:
+        questions =  Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(search)))
+        questions = [question.format() for question in questions.all()]
+        return jsonify({
+            "questions": questions ,
+            "total_matched_questions": len(questions)
+        })
+      else:
+        abort(404)
+    except:
+      abort(404)
   '''
   @TODO: 
   Create a GET endpoint to get questions based on category. 
