@@ -45,7 +45,8 @@ def create_app(test_config=None):
     categories = list(map(Category.format, Category.query.all()))
     return jsonify({
       "success": True,
-      "categories": categories
+      "categories": categories,
+      "total_categories": len(categories)
     })
 
   '''
@@ -66,13 +67,14 @@ def create_app(test_config=None):
     questions = Question.query.all()
     current_page_questions = paginate_questions(request, questions)
     categories = list(map(Category.format, Category.query.all()))
-    
+    if len(current_page_questions) == 0:
+      abort(404)
     return jsonify({
       "success": True,
       "questions": current_page_questions,
       "total_questions": len(Question.query.all()),
       "categories": categories,
-      "current_catrgory": None
+      "current_category": None
     })
 
   '''
@@ -92,7 +94,7 @@ def create_app(test_config=None):
       
       question.delete()
       selection = Question.query.order_by(Question.id).all()
-      current_questions = paginate_questions(request, selection)
+      current_questions = [question.format() for question in selection]
 
       return jsonify({
         "success": True,
@@ -118,8 +120,8 @@ def create_app(test_config=None):
   @app.route('/questions',methods=['POST'])
   def add_question():
     body = request.get_json()
-
-    new_question =  body.get('questions', None)
+    print(body)
+    new_question =  body.get('question', None)
     new_answer = body.get('answer', None)
     new_category = body.get('category', None)
     new_difficulty = body.get('difficulty', None)
@@ -201,22 +203,21 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
-  @app.route('/quiz', methods=['POST'])
+  @app.route('/quizzes', methods=['POST'])
   def get_quiz_quesitons():
     body = request.get_json()
-
+    
     previous_questions = body.get('previous_questions', [])
     quiz_category = body.get('quiz_category', None)
-    
     selection = []
     
     try:
       if quiz_category is not None:
-        if quiz_category == 0:
+        if quiz_category['id'] == 0:
           selections = Question.query.all()
         else:
-          selections = Question.query.filter(Question.category == quiz_category).all()
-        
+          selections = Question.query.filter(Question.category == quiz_category['id']).all()
+          
         question_set = [question.format() for question in selections 
                       if question.id not in previous_questions]
       
@@ -244,7 +245,7 @@ def create_app(test_config=None):
       return jsonify({
           "success": False,
           "error": 404,
-          "message": "esource not found"
+          "message": "Resource not found"
       }), 404
 
   @app.errorhandler(422)
