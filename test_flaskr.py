@@ -61,13 +61,12 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["success"], False)
         self.assertEqual(data["message"], "Resource not found")
 
+    def test_delete_question(self):
+        res = self.client().delete('/questions/25')
+        data = json.loads(res.data)
 
-    # def test_delete_question(self):
-    #     res = self.client().delete('/questions/20')
-    #     data = json.loads(res.data)
-
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data["success"], True)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
 
     def test_404_delete_question(self):
         res = self.client().delete('/questions/90')
@@ -123,6 +122,36 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data["success"], False)
         self.assertEqual(data["message"], "Resource not found")
+
+
+    def test_post_play_quiz(self):
+        post_data = {
+            'previous_questions': [],
+            'quiz_category': {
+                'type': 'Science',
+                'id': 1
+            }
+        }
+        res = self.client().post('/quizzes', json=post_data)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertTrue(data["question"])
+    
+    def test_422_post_play_quiz(self):
+        post_data = {
+            'previous_questions': [],
+            'quiz_category': {
+                'type': 'Science',
+            }
+        }
+        res = self.client().post('/quizzes', json=post_data)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["message"], "Unprocessable")
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()

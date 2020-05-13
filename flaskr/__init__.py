@@ -226,13 +226,12 @@ def create_app(test_config=None):
             "question": None
           })
         question = random.choice(question_set)
-        print(question)
         return jsonify({
             "success": True,
             "question": question
         })
     except:
-      abort(500)
+      abort(422)
 
   '''
   @TODO: 
