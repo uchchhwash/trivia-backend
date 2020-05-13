@@ -8,10 +8,8 @@ from models import setup_db, Question, Category
 
 
 class TriviaTestCase(unittest.TestCase):
-    """This class represents the trivia test case"""
 
     def setUp(self):
-        """Define test variables and initialize app."""
         self.app = create_app()
         self.client = self.app.test_client
         self.database_name = "trivia"
@@ -26,14 +24,10 @@ class TriviaTestCase(unittest.TestCase):
             self.db.create_all()
     
     def tearDown(self):
-        """Executed after reach test"""
         pass
 
-    """
-    TODO
-    Write at least one test for each test for successful operation and for expected errors.
-    """
 
+    #Test case for Getting Categories
     def test_get_categories(self):
         res = self.client().get('/categories')
         data = json.loads(res.data)
@@ -42,6 +36,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["success"], True)
         self.assertTrue(len(data["categories"]))
 
+
+    #Test case for Getting Questions by Pagination
     def test_get_questions(self):
         res = self.client().get('/questions?page=1')
         data = json.loads(res.data)
@@ -53,6 +49,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(len(data["questions"]))
 
 
+    #Test case for Getting 404 when Pagination Questions Unavailable
     def test_404_get_paginated_questions_unavailable(self):
         res = self.client().get('/questions?page=100')
         data = json.loads(res.data)
@@ -61,6 +58,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["success"], False)
         self.assertEqual(data["message"], "Resource not found")
 
+
+    #Test case for Delete Question by ID
     def test_delete_question(self):
         res = self.client().delete('/questions/25')
         data = json.loads(res.data)
@@ -68,6 +67,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data["success"], True)
 
+
+    #Test case Getting 404 when question is unavailable
     def test_404_delete_question(self):
         res = self.client().delete('/questions/90')
         data = json.loads(res.data)
@@ -77,6 +78,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["message"], "Resource not found")
 
 
+    #Test case for Add New Question
     def test_post_new_question(self):
         post_data = {
             'question': 'new question',
@@ -90,6 +92,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data["success"], True)
 
+
+    #Test case for 404 when Missing Input Provided while Adding New Question
     def test_404_post_new_question(self):
         post_data = {
             'question': 'a',
@@ -103,6 +107,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["success"], False)
         self.assertEqual(data["message"], "Resource not found")
 
+
+    #Test case for Search Question by String
     def test_search_questions(self):
             post_data = {
                 'searchTerm': 'lake',
@@ -115,6 +121,8 @@ class TriviaTestCase(unittest.TestCase):
             self.assertTrue(data["total_matched_questions"])
             self.assertTrue(len(data["questions"]))
 
+
+    #Test case for 404 Search Question by String Fails
     def test_404_search_questions(self):
         res = self.client().post('/search')
         data = json.loads(res.data)
@@ -124,6 +132,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["message"], "Resource not found")
 
 
+    #Test case for Get Question for Playing Quiz
     def test_post_play_quiz(self):
         post_data = {
             'previous_questions': [],
@@ -139,6 +148,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["success"], True)
         self.assertTrue(data["question"])
     
+
+    #Test case for 422 when Get Question for Playing Quiz Fails
     def test_422_post_play_quiz(self):
         post_data = {
             'previous_questions': [],
@@ -152,6 +163,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data["success"], False)
         self.assertEqual(data["message"], "Unprocessable")
-# Make the tests conveniently executable
+
+
+
 if __name__ == "__main__":
     unittest.main()
