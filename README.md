@@ -168,7 +168,35 @@ DELETE `/questions/<question_id>`
 - Delete question from the questions list.
 - Request Arguments: Question ID
 - Returns: true if successfully deleted.
-Example Response `{"success":true}`
+Example Response 
+{
+  "deleted": 19,
+  "questions": [
+    {
+      "answer": "Apollo 13",
+      "category": 5,
+      "difficulty": 4,
+      "id": 2,
+      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+    },
+    {
+      "answer": "Tom Cruise",
+      "category": 5,
+      "difficulty": 4,
+      "id": 4,
+      "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+    },
+    {
+      "answer": "Edward Scissorhands",
+      "category": 5,
+      "difficulty": 3,
+      "id": 6,
+      "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
+    }
+  ],
+  "success": true,
+  "total_questions": 3
+}
 
 POST `/questions`
 - Create a new question
@@ -202,15 +230,48 @@ GET `/categories/<int:category_id>/questions`
 - To get questions based on category
 - Request Arguments: Category Id and Page Number.
 - Returns: List of questions, number of total questions, current category and categories.
-
+{
+  "current_category": 2,
+  "questions": [
+    {
+      "answer": "Escher",
+      "category": 2,
+      "difficulty": 1,
+      "id": 16,
+      "question": "Which Dutch graphic artist–initials M C was a creator of optical illusions?"
+    },
+    {
+      "answer": "Mona Lisa",
+      "category": 2,
+      "difficulty": 3,
+      "id": 17,
+      "question": "La Giaconda is better known as what?"
+    },
+  ],
+  "success": true,
+  "total_questions": 2
+}
 POST `/quizzes`
 - To get questions to play the quiz.
 - Request Body: quiz_category and previous_questions.
 - Returns: Random question within the given category.
-Example Request Payload `{"previous_questions":[],"quiz_category":{"type":"Science","id":1}}`
+Example Request Payload 
+{
+	"previous_questions":[2,9,10,16,19,18,17,28,20,22],
+	"quiz_category": 1
+}
 
-Example Response `{"question":{"answer":"Blood","category":1,"difficulty":4,"id":22,"question":"Hematology is a branch of medicine involving the study of what?"},"success":true}`
-
+Example Response 
+{
+  "question": {
+    "answer": "Alexander Fleming",
+    "category": 1,
+    "difficulty": 3,
+    "id": 21,
+    "question": "Who discovered penicillin?"
+  },
+  "success": true
+}
 
 ## Testing
 To run the tests, run
