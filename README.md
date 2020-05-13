@@ -99,8 +99,8 @@ GET `/questions?page=<page_number>`
 - Request Arguments: Page Number
 - Returns: List of questions, number of total questions, current category and categories.
 
+```
 Example Response:
-`
 {
   "categories": [
     {
@@ -163,11 +163,15 @@ Example Response:
   "success": true, 
   "total_questions": 20
 }
-`
+
+```
+
 DELETE `/questions/<question_id>`
 - Delete question from the questions list.
 - Request Arguments: Question ID
 - Returns: true if successfully deleted.
+
+```
 Example Response 
 {
   "deleted": 19,
@@ -198,20 +202,41 @@ Example Response
   "total_questions": 3
 }
 
+```
+
 POST `/questions`
 - Create a new question
 - Request Body: question, answer, difficulty and category.
 - Returns: true if successfully created.
 - Example Request Payload {"question":"test question","answer":"test answer","difficulty":"3","category":1}
 
+```
 Example Response `{"success":true}`
+{
+  "created": 1,
+  "questions": [
+    {
+      "answer": "Apollo 13",
+      "category": 5,
+      "difficulty": 4,
+      "id": 2,
+      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+    }
+  ],
+  "success": true,
+  "total_quesitons": 1
+}
+```
 
-POST `/searchQuestions`
+
+POST `/search`
 - Searches for the questions
 - Request Arguments: Page Number
 - Request Body: search_data
 - Returns: List of questions, number of total questions and current category.
-- Example Request Payload `{"searchTerm":"Anne"}`
+
+```
+Example Request Payload `{"searchTerm":"Anne"}`
 {
   "questions": [
     {
@@ -225,11 +250,16 @@ POST `/searchQuestions`
   "success": true,
   "total_matched_questions": 1
 }
+```
+
 
 GET `/categories/<int:category_id>/questions`
 - To get questions based on category
 - Request Arguments: Category Id and Page Number.
 - Returns: List of questions, number of total questions, current category and categories.
+
+```
+Example Response
 {
   "current_category": 2,
   "questions": [
@@ -251,6 +281,8 @@ GET `/categories/<int:category_id>/questions`
   "success": true,
   "total_questions": 2
 }
+```
+
 POST `/quizzes`
 - To get questions to play the quiz.
 - Request Body: quiz_category and previous_questions.
@@ -261,6 +293,7 @@ Example Request Payload
 	"quiz_category": 1
 }
 
+```
 Example Response 
 {
   "question": {
@@ -272,6 +305,7 @@ Example Response
   },
   "success": true
 }
+```
 
 ## Testing
 To run the tests, run
