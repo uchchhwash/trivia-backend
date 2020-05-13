@@ -33,11 +33,8 @@ class TriviaTestCase(unittest.TestCase):
     TODO
     Write at least one test for each test for successful operation and for expected errors.
     """
-    
 
-   
-
-    def get_categories(self):
+    def test_get_categories(self):
         res = self.client().get('/categories')
         data = json.loads(res.data)
 
@@ -56,6 +53,76 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(len(data["questions"]))
 
 
+    def test_404_get_paginated_questions_unavailable(self):
+        res = self.client().get('/questions?page=100')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["message"], "Resource not found")
+
+
+    # def test_delete_question(self):
+    #     res = self.client().delete('/questions/20')
+    #     data = json.loads(res.data)
+
+    #     self.assertEqual(res.status_code, 200)
+    #     self.assertEqual(data["success"], True)
+
+    def test_404_delete_question(self):
+        res = self.client().delete('/questions/90')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["message"], "Resource not found")
+
+
+    def test_post_new_question(self):
+        post_data = {
+            'question': 'new question',
+            'answer': 'new answer',
+            'difficulty': 1,
+            'category': 1
+        }
+        res = self.client().post('/questions', json=post_data)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+
+    def test_404_post_new_question(self):
+        post_data = {
+            'question': 'a',
+            'answer': 'a',
+            'category': 1
+        }
+        res = self.client().post('/questions', json=post_data)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["message"], "Resource not found")
+
+    def test_search_questions(self):
+            post_data = {
+                'searchTerm': 'lake',
+            }
+            res = self.client().post('/search', json=post_data)
+            data = json.loads(res.data)
+
+            self.assertEqual(res.status_code, 200)
+            self.assertEqual(data["success"], True)
+            self.assertTrue(data["total_matched_questions"])
+            self.assertTrue(len(data["questions"]))
+
+    def test_404_search_questions(self):
+        res = self.client().post('/search')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["message"], "Resource not found")
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
