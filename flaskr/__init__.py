@@ -40,7 +40,6 @@ def create_app(test_config=None):
                              'GET,PUT,POST,DELETE,OPTIONS')
         return response
 
-
 # API for Getting All Categories
 
     @app.route('/categories', methods=['GET'])
@@ -93,17 +92,17 @@ def create_app(test_config=None):
     @app.route('/questions', methods=['POST'])
     def add_question():
         body = request.get_json()
-        new_question = body.get('question', None)
-        new_answer = body.get('answer', None)
-        new_category = body.get('category', None)
-        new_difficulty = body.get('difficulty', None)
-        valid_flag = [new_question, new_answer, new_category, new_difficulty]
+        question = body.get('question', None)
+        answer = body.get('answer', None)
+        category = body.get('category', None)
+        difficulty = body.get('difficulty', None)
+        valid_flag = [question, answer, category, difficulty]
         if all(valid_flag) is False:
             abort(400)
 
         try:
-            question = Question(question=new_question, answer=new_answer,
-                                category=new_category, difficulty=new_difficulty)
+            question = Question(question=question, answer=answer,
+                                category=category, difficulty=difficulty)
             question.insert()
 
             selection = Question.query.order_by(Question.id).all()
@@ -116,7 +115,7 @@ def create_app(test_config=None):
                 "total_quesitons": len(Question.query.all())
             })
 
-        except:
+        except Exception:
             abort(500)
 
     # API for Search for a Question by String
@@ -136,7 +135,7 @@ def create_app(test_config=None):
                 })
             else:
                 abort(422)
-        except:
+        except Exception:
             abort(404)
 
     # API for Get Questions by category
@@ -153,7 +152,7 @@ def create_app(test_config=None):
                 "total_questions": len(questions),
                 "current_category": category_id
             })
-        except:
+        except Exception:
             abort(404)
 
     # API for Get Question to play the quiz.
@@ -187,7 +186,7 @@ def create_app(test_config=None):
                     "success": True,
                     "question": question
                 })
-        except:
+        except Exception:
             abort(422)
 
     # ALL Error Handlers
