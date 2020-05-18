@@ -59,25 +59,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["success"], False)
         self.assertEqual(data["message"], "Resource not found")
 
-    # Test case for Delete Question by ID
-
-    def test_delete_question(self):
-        res = self.client().delete('/questions/58')
-        data = json.loads(res.data)
-
-        self.assertEqual(res.status_code, 200)
-        self.assertEqual(data["success"], True)
-
-    # Test case Getting 404 when question is unavailable
-
-    def test_404_delete_question(self):
-        res = self.client().delete('/questions/90')
-        data = json.loads(res.data)
-
-        self.assertEqual(res.status_code, 404)
-        self.assertEqual(data["success"], False)
-        self.assertEqual(data["message"], "Resource not found")
-
     # Test case for Add New Question
 
     def test_post_new_question(self):
@@ -89,7 +70,6 @@ class TriviaTestCase(unittest.TestCase):
         }
         res = self.client().post('/questions', json=post_data)
         data = json.loads(res.data)
-
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data["success"], True)
 
@@ -107,6 +87,27 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data["success"], False)
         self.assertEqual(data["message"], "Bad Request")
+
+    # Test case for Delete Question by ID
+
+    def test_delete_question(self):
+        db_last_question = self.client().get('/questions/last_question')
+        db_last_question = json.loads(db_last_question.data)
+        db_last_question = str(db_last_question["question_id"])
+        res = self.client().delete('/questions/' + db_last_question)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+
+    # Test case Getting 404 when question is unavailable
+
+    def test_404_delete_question(self):
+        res = self.client().delete('/questions/90')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["message"], "Resource not found")
 
     # Test case for Search Question by String
 

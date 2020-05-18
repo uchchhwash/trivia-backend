@@ -118,7 +118,19 @@ def create_app(test_config=None):
         except Exception:
             abort(500)
 
+    # Get the last question for TEST Delete
+    @app.route('/questions/last_question', methods=['GET'])
+    def get_last_question_test():
+        question = Question.query.order_by(Question.id.desc()).first()
+        question.format()
+        if (question is not None):
+            return jsonify({
+                "success": True,
+                "question_id": question.id,
+            })
+        abort(404)
     # API for Search for a Question by String
+
     @app.route('/search', methods=['POST'])
     def search_questions():
         try:
